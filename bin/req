@@ -1,0 +1,85 @@
+#!/bin/sh
+
+usage() {
+    cat << EOF
+usage: req [--version] [--help] <command> [<args>]
+
+The most commonly used req commands are:
+  add      Add requirement contents to the index
+  new      Create a requirement
+  init     Create an empty req repository
+  trace    Create a trace to a requirement
+  rm       Remove a requirement
+
+See 'req help <command>' for more information on a specific command.
+EOF
+}
+
+gitwrapper() {
+    git --git-dir="`pwd`/.req" --work-tree="`pwd`" $@
+}
+
+get_next_requirement_id() {
+    # 1. Find all files with a filename of a digit
+    # 2. Remove the directory
+    # 3. Sort the filenames
+    # 4. Get the largest number
+    # 5. Increment it
+    #local next=`ls | sort | tail -n 1`
+    local next=`find -type f -name '[[:digit:]]' | sed 's/\.\///g' | sort | tail -n 1`
+    [ "x$next" = "x" ] && next="0" || next="$((next+1))"
+    echo $next
+}
+
+# Start   Parse command line
+
+OPTS=`getopt -o hv -l help,version -- "$@"`
+if [ $? != 0 ]; then
+    exit 1
+fi
+
+eval set -- "$OPTS"
+
+while true ; do
+    case "$1" in
+      -v | --version)
+        echo "1.0.0"; exit 0;;
+      -h | --help)
+        usage; shift;;
+      --)
+        shift; break;;
+    esac
+done
+
+# End     Parse command line
+
+case "$1" in
+  add)
+    echo "Not implemented"; exit 1
+    ;;
+  new)
+    shift; echo "$@" > `get_next_requirement_id`
+    ;;
+  help)
+    [ "x$2" = "x" ] && man "$2" || echo "req: '$2' is not a req command. See 'req --help'."
+    ;;
+  init)
+    # Create a Git repository under .req directory
+    # Add .req directory to Git's ignore list
+    gitwrapper init && echo ".req/" >> "`pwd`/.req/info/exclude"
+    ;;
+  rm)
+    echo "Not implemented"; exit 1
+    ;;
+  status)
+    gitwrapper status
+    ;;
+  trace)
+    echo "Not implemented"; exit 1
+    ;;
+  *)
+    [ "x$1" = "x" ] && usage || echo "req: '$1' is not a req command. See 'req --help'."
+    ;;
+esac
+
+exit 0
