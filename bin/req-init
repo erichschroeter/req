@@ -1,0 +1,44 @@
+#!/bin/sh
+
+usage() {
+    cat << EOF
+usage: req-init [--help] [<args>]
+EOF
+}
+
+gitwrapper() {
+    git --git-dir="`pwd`/.req" --work-tree="`pwd`" $@
+}
+
+main() {
+# Start   Parse command line
+
+    OPTS=`getopt -o h -l help -- "$@"`
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+
+    eval set -- "$OPTS"
+
+    while true ; do
+        case "$1" in
+          -h | --help)
+            usage; shift;;
+          --)
+            shift; break;;
+        esac
+    done
+
+# End     Parse command line
+
+    # Create a Git repository under .req directory
+    # Add .req directory to Git's ignore list
+    gitwrapper init $@
+    if [ $? -eq 0 ]; then
+        cat >> "`pwd`/.req/info/exclude" << EOF
+.req/
+EOF
+    fi
+}
+
+main $@

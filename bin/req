@@ -64,9 +64,7 @@ case "$1" in
     [ "x$2" = "x" ] && man "$2" || echo "req: '$2' is not a req command. See 'req --help'."
     ;;
   init)
-    # Create a Git repository under .req directory
-    # Add .req directory to Git's ignore list
-    gitwrapper init && echo ".req/" >> "`pwd`/.req/info/exclude"
+    req-init $@
     ;;
   rm)
     echo "Not implemented"; exit 1
