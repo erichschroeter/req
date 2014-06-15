@@ -8,6 +8,9 @@ The most commonly used req commands are:
   add      Add requirement contents to the index
   new      Create a requirement
   init     Create an empty req repository
+  log      Show commit logs
+  show     Show the contents of a requirement
+  tag      Create, list, or delete a tag for a requirement
   trace    Create a trace to a requirement
   rm       Remove a requirement
 
@@ -36,11 +39,20 @@ case "$CMD" in
   init)
     req-init $@
     ;;
+  log)
+    echo "Not implemented"; exit 1
+    ;;
   rm)
     req-rm $@
     ;;
+  show)
+    echo "Not implemented"; exit 1
+    ;;
   status)
     gitwrapper status
+    ;;
+  tag)
+    echo "Not implemented"; exit 1
     ;;
   trace)
     req-trace $@
