@@ -37,7 +37,7 @@ case "$CMD" in
     req-init $@
     ;;
   rm)
-    echo "Not implemented"; exit 1
+    req-rm $@
     ;;
   status)
     gitwrapper status
