@@ -19,18 +19,6 @@ gitwrapper() {
     git --git-dir="`pwd`/.req" --work-tree="`pwd`" $@
 }
 
-get_next_requirement_id() {
-    # 1. Find all files with a filename of a digit
-    # 2. Remove the directory
-    # 3. Sort the filenames
-    # 4. Get the largest number
-    # 5. Increment it
-    #local next=`ls | sort | tail -n 1`
-    local next=`find -type f -name '[[:digit:]]' | sed 's/\.\///g' | sort | tail -n 1`
-    [ "x$next" = "x" ] && next="0" || next="$((next+1))"
-    echo $next
-}
-
 CMD=$1
 # Only shift args if a command was specified
 [ "x$CMD" = "x" ] || shift
@@ -40,7 +28,7 @@ case "$CMD" in
     echo "Not implemented"; exit 1
     ;;
   new)
-    shift; echo "$@" > `get_next_requirement_id`
+    req-new $@
     ;;
   help)
     [ "x$2" = "x" ] && man "$2" || echo "req: '$2' is not a req command. See 'req --help'."

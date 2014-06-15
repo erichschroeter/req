@@ -1,0 +1,69 @@
+#!/bin/bash
+
+usage() {
+    cat << EOF
+usage: req-new [--help] [--id <id>] [<args>]...
+EOF
+}
+
+gitwrapper() {
+    git --git-dir="`pwd`/.req" --work-tree="`pwd`" $@
+}
+
+get_next_requirement_id() {
+    # 1. Find all files with a filename of a digit
+    # 2. Remove the directory
+    # 3. Sort the filenames
+    # 4. Get the largest number
+    # 5. Increment it
+    #local next=`ls | sort | tail -n 1`
+    local next=`find -type f -name '[[:digit:]]' | sed 's/\.\///g' | sort | tail -n 1`
+    [ "x$next" = "x" ] && next="0" || next="$((next+1))"
+    echo $next
+}
+
+main() {
+    local id
+
+# Start   Parse command line
+
+    OPTS=`getopt -o h -l help,id: -- "$@"`
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+
+    eval set -- "$OPTS"
+
+    while true ; do
+        case "$1" in
+          -h | --help)
+            usage; shift;;
+          --id)
+            shift; id=$1; shift;;
+          --)
+            shift; break;;
+        esac
+    done
+
+    # Set the id if not specified by option
+    [ "x$id" = "x" ] && id=`get_next_requirement_id`
+
+# End     Parse command line
+
+    # If there are any args consider them requirement text
+    # otherwise open an editor to write
+    if [ $# -gt 0 ] ; then
+        # Echo everything passed in as text to new file
+        echo "$@" > $id
+    else
+        if [ "x$EDITOR" = "x" ] ; then
+            echo "\$EDITOR not set." 1>&2
+        else
+            $EDITOR $id
+        fi
+    fi
+}
+
+main $@
+
+
