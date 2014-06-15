@@ -1,0 +1,70 @@
+#!/bin/bash
+
+usage() {
+    cat << EOF
+usage: req-trace [--help] [-i <in>] [-o <out>] [<args>]
+EOF
+}
+
+gitwrapper() {
+    git --git-dir="`pwd`/.req" --work-tree="`pwd`" $@
+}
+
+trace() {
+    local from to traceDir
+
+    from=$1
+    to=$2
+    traceDir="`pwd`/.traces"
+
+    # Make sure dirs exist
+    mkdir -p "$traceDir/$from"
+    mkdir -p "$traceDir/$to"
+
+    echo "$to" >> "$traceDir/$from/out"
+    echo "$from" >> "$traceDir/$to/in"
+}
+
+main() {
+    local inTraces outTraces array
+# Start   Parse command line
+
+    OPTS=`getopt -o hi:o: -l help,in,out -- "$@"`
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+
+    eval set -- "$OPTS"
+
+    while true ; do
+        case "$1" in
+          -h | --help)
+            usage; shift;;
+          -i | --in)
+            shift; inTraces=$1; shift;;
+          -o | --out)
+            shift; outTraces=$1; shift;;
+          --)
+            shift; break;;
+        esac
+    done
+
+# End     Parse command line
+
+    # Create trace between the in and out traceables
+    for req in $@; do
+        # Split the comma-separated list of in traces
+        array=(${inTraces//,/ })
+        for i in "${array[@]}"; do
+            trace $i $req
+        done
+        # Split the comma-separated list of in traces
+        array=(${outTraces//,/ })
+        for o in "${array[@]}"; do
+            trace $req $o
+        done
+    done
+}
+
+main $@
+

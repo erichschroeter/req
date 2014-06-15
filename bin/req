@@ -77,7 +77,7 @@ case "$CMD" in
     gitwrapper status
     ;;
   trace)
-    echo "Not implemented"; exit 1
+    req-trace $@
     ;;
   *)
     [ "x$1" = "x" ] && usage || echo "req: '$1' is not a req command. See 'req --help'."
