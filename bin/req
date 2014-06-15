@@ -31,28 +31,6 @@ get_next_requirement_id() {
     echo $next
 }
 
-# Start   Parse command line
-
-OPTS=`getopt -o hv -l help,version -- "$@"`
-if [ $? != 0 ]; then
-    exit 1
-fi
-
-eval set -- "$OPTS"
-
-while true ; do
-    case "$1" in
-      -v | --version)
-        echo "1.0.0"; exit 0;;
-      -h | --help)
-        usage; shift;;
-      --)
-        shift; break;;
-    esac
-done
-
-# End     Parse command line
-
 CMD=$1
 # Only shift args if a command was specified
 [ "x$CMD" = "x" ] || shift
@@ -80,6 +58,28 @@ case "$CMD" in
     req-trace $@
     ;;
   *)
+    # Start   Parse command line
+
+    OPTS=`getopt -o hv -l help,version -- "$@"`
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+
+    eval set -- "$OPTS"
+
+    while true ; do
+        case "$1" in
+          -v | --version)
+            echo "1.0.0"; exit 0;;
+          -h | --help)
+            usage; shift;;
+          --)
+            shift; break;;
+        esac
+    done
+
+    # End     Parse command line
+
     [ "x$1" = "x" ] && usage || echo "req: '$1' is not a req command. See 'req --help'."
     ;;
 esac
